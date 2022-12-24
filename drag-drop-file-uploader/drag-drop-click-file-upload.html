@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="drag-drop-click-file-upload.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <title>Drag Drop + click file upload</title>
+    <!--    down below is just a stimulus js controller-->
+    <script type="module">
+      import {Application, Controller} from "https://unpkg.com/@hotwired/stimulus/dist/stimulus.js"
+
+      window.Stimulus = Application.start()
+
+      Stimulus.register("upload", class extends Controller {
+        static targets = ["fileField", "dropZone", 'fileName']
+
+        connect() {
+          // add the drag drop funcationality on page load
+          this.dragDropFile()
+        }
+
+        // open file picker when user click the box
+        fileUpload() {
+          this.fileFieldTarget.click()
+          this.displayFileName()
+        }
+
+        // pick the droped file and past into input field
+        dragDropFile() {
+          let that = this
+          $(this.dropZoneTarget).on('dragover ondragenter', false)
+            .on('drop', function (evt) {
+              that.fileFieldTarget.files = evt.originalEvent.dataTransfer.files;
+              evt.preventDefault();
+              that.displayFileName()
+            });
+        }
+
+        // just display the file name
+        displayFileName() {
+          let fileName = this.fileFieldTarget.value.split('\\')
+          fileName = fileName[fileName.length - 1]
+          this.fileNameTarget.innerHTML = fileName
+        }
+      })
+    </script>
+</head>
+<body data-controller="upload">
+<div class="file-upload-wrapper">
+    <input class="file-receiver" type="file" data-upload-target="fileField" id="j"
+           data-action="change->upload#displayFileName">
+    <span class="file-upload" data-action="click->upload#fileUpload" data-upload-target="dropZone">
+        <span class="message">
+            <span class="upload-icon-wrapper">
+                <img src="upload.svg" class="upload-icon">
+            </span>
+            Click or drag and drop to upload file
+        </span>
+    </span>
+</div>
+<span class="name-heading">File Name:</span><span data-upload-target="fileName" class="file-name"></span>
+<div class="file-name-wrapper">
+</div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
