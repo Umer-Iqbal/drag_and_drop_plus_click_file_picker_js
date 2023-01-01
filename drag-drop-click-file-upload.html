@@ -12,7 +12,7 @@
       window.Stimulus = Application.start()
 
       Stimulus.register("upload", class extends Controller {
-        static targets = ["fileField", "dropZone", 'fileName']
+        static targets = ["fileField", "dropZone", 'fileName', 'fileView']
 
         connect() {
           // add the drag drop funcationality on page load
@@ -23,6 +23,7 @@
         fileUpload() {
           this.fileFieldTarget.click()
           this.displayFileName()
+          this.displayFileView()
         }
 
         // pick the droped file and past into input field
@@ -33,6 +34,7 @@
               that.fileFieldTarget.files = evt.originalEvent.dataTransfer.files;
               evt.preventDefault();
               that.displayFileName()
+              that.displayFileView(that.fileFieldTarget, true)
             });
         }
 
@@ -42,13 +44,35 @@
           fileName = fileName[fileName.length - 1]
           this.fileNameTarget.innerHTML = fileName
         }
+
+        // just display the file image or view
+        displayFileView(event, droppedFile = false) {
+          let file
+          if (droppedFile == true) {
+            file = event.files[0]
+          } else {
+            file = $(event.target)[0].files[0]
+          }
+          let that = this
+          let reader = new FileReader()
+          reader.onload = function (e) {
+            const docImg = document.createElement('img')
+            docImg.classList.add('h-100', 'w-100')
+            docImg.src = e.target.result
+
+
+            that.fileViewTarget.prepend(docImg)
+          }
+          reader.readAsDataURL(file)
+
+      }
       })
     </script>
 </head>
 <body data-controller="upload">
 <div class="file-upload-wrapper">
     <input class="file-receiver" type="file" data-upload-target="fileField" id="j"
-           data-action="change->upload#displayFileName">
+           data-action="change->upload#displayFileView">
     <span class="file-upload" data-action="click->upload#fileUpload" data-upload-target="dropZone">
         <span class="message">
             <span class="upload-icon-wrapper">
@@ -59,7 +83,8 @@
     </span>
 </div>
 <span class="name-heading">File Name:</span><span data-upload-target="fileName" class="file-name"></span>
-<div class="file-name-wrapper">
+<div class="file-upload" data-upload-target="fileView">
 </div>
+
 </body>
 </html>
